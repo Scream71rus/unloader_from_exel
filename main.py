@@ -1,5 +1,6 @@
 
 import os
+import argparse
 from dotenv import load_dotenv
 
 from src.AppHandler import AppHandler
@@ -46,11 +47,25 @@ STATUSES_MAP = {
 def main():
     load_dotenv(verbose=True)
 
-    base_uri = os.getenv('BASE_URI')
-    cabinet_uri = os.getenv('CABINET_URI')
-    token = os.getenv('ACCESS_TOKEN')
-    email = os.getenv('DEVELOPER_EMAIL')
-    folder_path = os.getenv('FOLDER_PATH')
+    arg_parser = argparse.ArgumentParser(description='')
+
+    arg_parser.add_argument('--base_uri', default=os.getenv('BASE_URI'))
+    arg_parser.add_argument('--cabinet_uri', default=os.getenv('CABINET_URI'))
+    arg_parser.add_argument('--access_token', default=os.getenv('ACCESS_TOKEN'))
+    arg_parser.add_argument('--developer_email', default=os.getenv('DEVELOPER_EMAIL'))
+    arg_parser.add_argument('--folder_path', default=os.getenv('FOLDER_PATH'))
+
+    args = arg_parser.parse_args()
+
+    base_uri = args.base_uri
+    cabinet_uri = args.cabinet_uri
+    token = args.access_token
+    email = args.developer_email
+    folder_path = args.folder_path
+
+    if not base_uri or not cabinet_uri or not token or not email or not folder_path:
+        print('You must provide required configuration parameters')
+        exit(arg_parser.print_usage())
 
     file_ext = ('xlsx', 'xls')
 

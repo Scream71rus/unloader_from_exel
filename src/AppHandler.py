@@ -144,8 +144,8 @@ class AppHandler:
                     continue
 
                 resume_list = get_files_by_filename(
-                    os.path.join(self.folder_path, ),
-                    item.get('name').get('full_name')
+                    os.path.join(self.folder_path, get_in_path(['position', 'title'], item)),
+                    get_in_path(['name', 'full_name'], item)
                 )
 
                 prepared_resume = None
