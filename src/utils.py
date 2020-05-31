@@ -24,7 +24,7 @@ def get_in_path(path, source):
 
 def make_ext(func):
     def wrapper(file_path, ext):
-        return func(file_path, tuple(map(lambda x: ".%s" % x, ext)))
+        return func(file_path, tuple(map(lambda x: '.%s' % x, ext)))
 
     return wrapper
 

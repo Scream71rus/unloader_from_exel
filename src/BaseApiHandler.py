@@ -4,10 +4,10 @@ from urllib.parse import urljoin
 
 
 class BaseApiHandler(requests.Session):
-    def __init__(self, base_uri=None, email="", token="", *args, **kwargs):
+    def __init__(self, base_uri=None, email='', token='', *args, **kwargs):
         super(BaseApiHandler, self).__init__(*args, **kwargs)
         if not base_uri:
-            raise Exception("You must provide at least base uri")
+            raise Exception('You must provide at least base uri')
 
         self.prefix_url = base_uri
 

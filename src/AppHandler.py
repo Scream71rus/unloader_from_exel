@@ -110,7 +110,7 @@ class AppHandler:
     @make_response
     def upload_file(self, account_id, files):
         headers = {
-            "X-File-Parse": "true",
+            'X-File-Parse': 'true',
         }
 
         return self.http_client.request('POST', '/account/%s/upload' % account_id, files=files, headers=headers)
@@ -130,9 +130,13 @@ class AppHandler:
 
         self.normalizer = NormalizeHandler(status_list, vacancy_list, statuses_map)
 
+        xls_parser = XLSParser(self.parse_map, self.normalizer)
+
         files = get_files_by_ext(self.folder_path, self.file_ext)
+
+        # TODO: think about parallel executing
         for file in files:
-            items = XLSParser(os.path.join(self.folder_path, file), self.parse_map, self.normalizer).run()
+            items = xls_parser.run(os.path.join(self.folder_path, file))
 
             for item in items:
                 resume_name = item.get('position').get('title')
@@ -145,7 +149,6 @@ class AppHandler:
                 )
 
                 prepared_resume = None
-                original_resume = None
                 externals = []
 
                 for resume in resume_list:
@@ -161,34 +164,33 @@ class AppHandler:
 
                     original_resume = resume_data.get('original')
 
-                    prepared_resume = resume_data.get("prepared")
-                    prepared_resume["money"] = item.get("money")
+                    prepared_resume = resume_data.get('prepared')
+                    prepared_resume['money'] = item.get('money')
 
                     externals.append({
-                        "data": {
-                            "body": get_in_path(["text"], original_resume),
+                        'data': {
+                            'body': get_in_path(['text'], original_resume),
                         },
-                        "files": [
+                        'files': [
                             {
-                                "id": get_in_path(["id"], original_resume),
+                                'id': get_in_path(['id'], original_resume),
                             }
                         ],
-                        "auth_type": "NATIVE",
-                        "account_source": None
+                        'auth_type': 'NATIVE',
+                        'account_source': None
                     })
 
-                prepared_resume["externals"] = externals
+                prepared_resume['externals'] = externals
                 applicant = self.save_applicant(account_id, json.dumps(prepared_resume))
 
-                is_declined = status_list["Declined"] == get_in_path(['status'], item)
+                # is_declined = status_list['Declined'] == get_in_path(['status'], item)
                 data = {
                     'vacancy': get_in_path(['position', 'id'], item),
                     'status': get_in_path(['status'], item),
                     'comment': get_in_path(['comment'], item),
                     'files': list(map(lambda el: get_in_path(['files', 0, 'id'], el), externals)),
-                    # "rejection_reason": get_in_path(['comment'], item) if is_declined else None
-                    "rejection_reason": None  # api всегда отвечает 400 если не None
-
+                    # 'rejection_reason': get_in_path(['comment'], item) if is_declined else None
+                    'rejection_reason': None  # api всегда отвечает 400 если не None
                 }
 
                 self.add_to_vacancy(account_id, applicant.get('id'), json.dumps(data))

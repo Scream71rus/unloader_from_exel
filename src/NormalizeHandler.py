@@ -11,7 +11,7 @@ class NormalizeHandler:
         self.vacancy_list = vacancy_list
 
     def get_numbers(self, s):
-        return "".join(re.findall(r'\b\d+\b', s))
+        return ''.join(re.findall(r'\b\d+\b', s))
 
     def get_status(self, status_name):
         status_key = self.statuses_map.get(status_name)
@@ -42,7 +42,7 @@ class NormalizeHandler:
     def normalizers(self, types):
         fns = []
         for t in types:
-            if t == "only_numbers":
+            if t == 'only_numbers':
                 fns.append(self.get_numbers)
             elif t == 'make_status':
                 fns.append(self.get_status)
