@@ -6,11 +6,11 @@ class XLSParser:
     def __init__(self, parse_map, normalizer):
         self.parse_map = parse_map
         self.parsed_sheet_map = {}
-        self.candidates = []
         self.normalizer = normalizer
 
     def parser(self, filename):
         sheets = openpyxl.load_workbook(filename=filename)
+        candidates = []
 
         for sheet in sheets:
             new_map = {}
@@ -18,7 +18,7 @@ class XLSParser:
                 for k, v in self.parse_map.items():
                     for column in row:
                         if column.value == v.get('title'):
-                            new_map[k] = {**v, **{'title': column.column}}
+                            new_map[k] = {**v, 'title': column.column}
 
             self.parsed_sheet_map[sheet.title] = new_map
 
@@ -29,8 +29,9 @@ class XLSParser:
                         if column.column == v.get('title'):
                             data[k] = self.normalizer.normalizers(v.get('normalize'))(str(column.value).strip())
 
-                self.candidates.append(data)
+                candidates.append(data)
+
+        return candidates
 
     def run(self, filename):
-        self.parser(filename)
-        return self.candidates
+        return self.parser(filename)
